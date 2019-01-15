@@ -8,61 +8,74 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
-var (
-	mongoHost    = "localhost"
-	mongoPort    = "27017"
-	mongoAddress = "mongodb://" + mongoHost + ":" + mongoPort
-)
+// MongoClient is struct with methods for working with MongoDB
+type MongoClient struct {
+	mongoHost string
+	mongoPort string
+	client *mongo.Client
+	ctx context.Context
+}
+
+// NewMongoClient is function for connecting to db and getting client 
+func NewMongoClient(mongoHost string, mongoPort string) (*MongoClient, error) {
+	var mc MongoClient
+	mongoAddress := "mongodb://" + mongoHost + ":" + mongoPort
+	var err error
+	mc.client, err = mongo.NewClient(mongoAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	mc.ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	err = mc.client.Connect(mc.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &mc, nil
+}
+
+// Disconnect is function for disconnecting from db
+func (mc MongoClient) Disconnect() error {
+	err := mc.client.Disconnect(mc.ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // SendDocument is function for sending document doc to DB dbName and collection collName
-func SendDocument(dbName string, collName string, doc map[string]interface{}) (interface{}, error) {
-	client, err := mongo.NewClient(mongoAddress)
-	if err != nil {
-		return nil, err
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err = client.Connect(ctx)
+func (mc MongoClient) SendDocument(dbName string, collName string, doc map[string]interface{}) (interface{}, error) {
+	collection := mc.client.Database(dbName).Collection(collName)
+	res, err := collection.InsertOne(mc.ctx, bson.M(doc))
 	if err != nil {
 		return nil, err
 	}
 
-	collection := client.Database(dbName).Collection(collName)
-	res, err := collection.InsertOne(ctx, bson.M(doc))
-	if err != nil {
-		return nil, err
-	}
-
-	err = client.Disconnect(ctx)
-	if err != nil {
-		return nil, err
-	}
 	return res.InsertedID, nil
 }
 
 // GetDocumentByLogin is function for finding users by user login
-func GetDocumentByLogin(dbName string, collName string, login string) (interface{}, error) {
-	client, err := mongo.NewClient(mongoAddress)
-	if err != nil {
-		return nil, err
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err = client.Connect(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func (mc MongoClient) GetDocumentByLogin(dbName string, collName string, login string) (interface{}, error) {
 	filter := make(map[string]interface{})
 	filter["login"] = login
-	collection := client.Database(dbName).Collection(collName)
-	res := collection.FindOne(ctx, bson.M(filter))
+	collection := mc.client.Database(dbName).Collection(collName)
+	res := collection.FindOne(mc.ctx, bson.M(filter))
 
-	err = client.Disconnect(ctx)
+	var resDoc interface{}
+	err := res.Decode(&resDoc)
 	if err != nil {
 		return nil, err
 	}
 
-	var resDoc interface{}
-	res.Decode(resDoc)
-
 	return resDoc, nil
+}
+
+// UpdateDocumentByLogin is function for updating user by login
+func (mc MongoClient) UpdateDocumentByLogin(dbName string, collName string, login string) (interface{}, error) {
+	return nil, nil
+}
+
+// DeleteDocumentByLogin is function for deleting user by login
+func (mc MongoClient) DeleteDocumentByLogin(dbName string, collName string, login string) (interface{}, error) {
+	return nil, nil
 }
