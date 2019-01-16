@@ -82,13 +82,15 @@ func (mc *MongoClient) UpdateDocumentByLogin(	ctx context.Context,
 	filter["login"] = login
 	updater := make(map[string]interface{})
 	updater[updatedKey] = updatedValue
+	set := make(map[string]interface{})
+	set["$set"] = updater
 	collection := mc.client.Database(dbName).Collection(collName)
-	res, err := collection.UpdateOne(ctx, bson.M(filter), bson.M(updater))
+	res, err := collection.UpdateOne(ctx, bson.M(filter), bson.M(set))
 	if err != nil {
 		return nil, err
 	}
 
-	return res.UpsertedID, nil
+	return res.ModifiedCount, nil
 }
 
 // DeleteDocumentByLogin is function for deleting user by login

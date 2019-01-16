@@ -92,13 +92,13 @@ func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	updatedValue := url.Get("updatedValue")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	id, err := h.Client.UpdateDocumentByLogin(ctx, "Main", "Users", login, 
+	updatedNumber, err := h.Client.UpdateDocumentByLogin(ctx, "Main", "Users", login, 
 												updatedKey, updatedValue)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Fprintf(w, "Updated user %s", id)
+	fmt.Fprintf(w, "Updated %d user documents\n", updatedNumber)
 }
 
 // DeleteUserHandler is handler for /DeleteUser method

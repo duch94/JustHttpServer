@@ -4,7 +4,7 @@
 
 Пример запроса на изменение юзера:
 
-``` ```
+```curl -X PUT "localhost:80/updateUser?login=vitya@email.com1&updatedKey=password&updatedValue=1231231231"```
 
 Пример запроса на получение юзера по логину:
 
