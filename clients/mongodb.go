@@ -80,3 +80,34 @@ func (mc *MongoClient) UpdateDocumentByLogin(ctx context.Context, dbName string,
 func (mc *MongoClient) DeleteDocumentByLogin(ctx context.Context, dbName string, collName string, login string) (interface{}, error) {
 	return nil, nil
 }
+
+// GetAllDocuments is function for getting all the user documents
+func (mc *MongoClient) GetAllDocuments(ctx context.Context, dbName string, collName string) ([]interface{}, error) {
+	filter := make(map[string]interface{})
+	collection := mc.client.Database(dbName).Collection(collName)
+	cursor, err := collection.Find(ctx, bson.M(filter))
+	if err != nil {
+		return nil, err
+	}
+
+	userDoc := struct {
+		Login string
+		Dob string
+		Name string
+		Password string
+	}{}
+	var resultSlice []interface{}
+	for {
+		if cursor.Next(ctx) {
+			err = cursor.Decode(&userDoc)
+			if err != nil {
+				return nil, err
+			}
+			resultSlice = append(resultSlice, userDoc)
+		} else {
+			break
+		}
+	}
+	
+	return resultSlice, nil
+}

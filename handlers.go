@@ -108,7 +108,13 @@ func (h *Handlers) UserListHandler(w http.ResponseWriter, r *http.Request) {
 		panic(fmt.Sprintln(errorMessage))
 	}
 	
-	fmt.Fprintf(w, "Server is healthy!")
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	users, err := h.Client.GetAllDocuments(ctx, "Main", "Users")
+	if err != nil {
+		panic(err)
+	}
+	
+	fmt.Fprintf(w, "User list:\n%s\n", users)
 }
 
 // HealthCheckHandler is handler for /healthCheck method
