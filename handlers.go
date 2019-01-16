@@ -86,7 +86,19 @@ func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		panic(fmt.Sprintln(errorMessage))
 	}
 
-	fmt.Fprintf(w, "Updated user")
+	url := r.URL.Query()
+	login := url.Get("login")
+	updatedKey := url.Get("updatedKey")
+	updatedValue := url.Get("updatedValue")
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	id, err := h.Client.UpdateDocumentByLogin(ctx, "Main", "Users", login, 
+												updatedKey, updatedValue)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Fprintf(w, "Updated user %s", id)
 }
 
 // DeleteUserHandler is handler for /DeleteUser method

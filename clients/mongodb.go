@@ -72,8 +72,23 @@ func (mc *MongoClient) GetDocumentByLogin(ctx context.Context, dbName string, co
 }
 
 // UpdateDocumentByLogin is function for updating user by login
-func (mc *MongoClient) UpdateDocumentByLogin(ctx context.Context, dbName string, collName string, login string) (interface{}, error) {
-	return nil, nil
+func (mc *MongoClient) UpdateDocumentByLogin(	ctx context.Context, 
+												dbName string, 
+												collName string, 
+												login string, 
+												updatedKey string, 
+												updatedValue string) (interface{}, error) {
+	filter := make(map[string]interface{})
+	filter["login"] = login
+	updater := make(map[string]interface{})
+	updater[updatedKey] = updatedValue
+	collection := mc.client.Database(dbName).Collection(collName)
+	res, err := collection.UpdateOne(ctx, bson.M(filter), bson.M(updater))
+	if err != nil {
+		return nil, err
+	}
+
+	return res.UpsertedID, nil
 }
 
 // DeleteDocumentByLogin is function for deleting user by login
