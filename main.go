@@ -7,13 +7,18 @@ import (
 
 func main() {
 	router := mux.NewRouter()
+	
+	h, err := NewHandlers("localhost", "27017")
+	if err != nil {
+		panic(err)
+	}
 
-	router.HandleFunc("/", RootHandler)
-	router.HandleFunc("/createUser", CreateUserHandler)
-	router.HandleFunc("/readUser", ReadUserHandler)
-	router.HandleFunc("/updateUser", UpdateUserHandler)
-	router.HandleFunc("/deleteUser", DeleteUserHandler)
-	router.HandleFunc("/healthCheck", HealthCheckHandler)
+	router.HandleFunc("/", h.RootHandler)
+	router.HandleFunc("/createUser", h.CreateUserHandler)
+	router.HandleFunc("/readUser", h.ReadUserHandler)
+	router.HandleFunc("/updateUser", h.UpdateUserHandler)
+	router.HandleFunc("/deleteUser", h.DeleteUserHandler)
+	router.HandleFunc("/healthCheck", h.HealthCheckHandler)
 
 	http.Handle("/", router)
 	http.ListenAndServe(":80", nil)
