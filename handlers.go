@@ -109,7 +109,16 @@ func (h *Handlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		panic(fmt.Sprintln(errorMessage))
 	}
 
-	fmt.Fprintf(w, "Deleted user")
+	url := r.URL.Query()
+	login := url.Get("login")
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	deletedUsersNum, err := h.Client.DeleteDocumentByLogin(ctx, "Main", "Users", login)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Fprintf(w, "Deleted %d users\n", deletedUsersNum)
 }
 
 // UserListHandler is handler for /userList method

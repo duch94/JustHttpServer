@@ -17,6 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer h.Client.Disconnect()
 
 	router.HandleFunc("/", h.RootHandler)
 	router.HandleFunc("/createUser", h.CreateUserHandler)

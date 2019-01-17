@@ -94,8 +94,18 @@ func (mc *MongoClient) UpdateDocumentByLogin(	ctx context.Context,
 }
 
 // DeleteDocumentByLogin is function for deleting user by login
-func (mc *MongoClient) DeleteDocumentByLogin(ctx context.Context, dbName string, collName string, login string) (interface{}, error) {
-	return nil, nil
+func (mc *MongoClient) DeleteDocumentByLogin(ctx context.Context, dbName string, collName string, login string) (int64, error) {
+	filter := make(map[string]interface{})
+	filter["login"] = login
+	collection := mc.client.Database(dbName).Collection(collName)
+	res, err := collection.DeleteOne(ctx, bson.M(filter))
+	if err != nil {
+		return 0, err
+	}
+
+	deletedUsersNum := res.DeletedCount
+
+	return deletedUsersNum, nil
 }
 
 // GetAllDocuments is function for getting all the user documents
