@@ -19,13 +19,13 @@ func main() {
 	}
 	defer h.Client.Disconnect()
 
-	router.HandleFunc("/", h.RootHandler)
-	router.HandleFunc("/createUser", h.CreateUserHandler)
-	router.HandleFunc("/readUser", h.ReadUserHandler)
-	router.HandleFunc("/updateUser", h.UpdateUserHandler)
-	router.HandleFunc("/deleteUser", h.DeleteUserHandler)
-	router.HandleFunc("/healthCheck", h.HealthCheckHandler)
-	router.HandleFunc("/userList", h.UserListHandler)
+	router.HandleFunc("/", h.RootHandler).Methods("GET")
+	router.HandleFunc("/createUser", h.CreateUserHandler).Methods("POST")
+	router.HandleFunc("/readUser", h.ReadUserHandler).Methods("GET")
+	router.HandleFunc("/updateUser", h.UpdateUserHandler).Methods("PUT")
+	router.HandleFunc("/deleteUser", h.DeleteUserHandler).Methods("DELETE")
+	router.HandleFunc("/healthCheck", h.HealthCheckHandler).Methods("GET")
+	router.HandleFunc("/userList", h.UserListHandler).Methods("GET")
 
 	http.Handle("/", router)
 	http.ListenAndServe(":80", nil)

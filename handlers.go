@@ -35,12 +35,6 @@ func (h *Handlers) RootHandler(w http.ResponseWriter, r *http.Request) {
 
 // CreateUserHandler is handler for /createUser method
 func (h *Handlers) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		errorMessage := "CreateUser request was performed not by POST method"
-		fmt.Fprintf(w, errorMessage)
-		panic(fmt.Sprintln(errorMessage))
-	}
-
 	r.ParseForm()
 
 	newUser := make(map[string]interface{})
@@ -53,26 +47,22 @@ func (h *Handlers) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	userID, err := h.Client.SendDocument(ctx, "Main", "Users", newUser)
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusCreated) 
 	fmt.Fprintf(w, "Created user %s\n", userID)
 }
 
 // ReadUserHandler is handler for /readUser method
 func (h *Handlers) ReadUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		errorMessage := "ReadUser request was performed not by GET method"
-		fmt.Fprintf(w, errorMessage)
-		panic(fmt.Sprintln(errorMessage))
-	}
-
 	url := r.URL.Query()
 	login := url.Get("login")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	user, err := h.Client.GetDocumentByLogin(ctx, "Main", "Users", login)
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	fmt.Fprintf(w, "Read user: \n%s\n", user)
@@ -80,12 +70,6 @@ func (h *Handlers) ReadUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUserHandler is handler for /updateUser method
 func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "PUT" {
-		errorMessage := "UpdateUser request was performed not by PUT method"
-		fmt.Fprintf(w, errorMessage)
-		panic(fmt.Sprintln(errorMessage))
-	}
-
 	url := r.URL.Query()
 	login := url.Get("login")
 	updatedKey := url.Get("updatedKey")
@@ -95,7 +79,7 @@ func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	updatedNumber, err := h.Client.UpdateDocumentByLogin(ctx, "Main", "Users", login, 
 												updatedKey, updatedValue)
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	fmt.Fprintf(w, "Updated %d user documents\n", updatedNumber)
@@ -103,19 +87,13 @@ func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUserHandler is handler for /DeleteUser method
 func (h *Handlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "DELETE" {
-		errorMessage := "DeleteUser request was performed not by DELETE method"
-		fmt.Fprintf(w, errorMessage)
-		panic(fmt.Sprintln(errorMessage))
-	}
-
 	url := r.URL.Query()
 	login := url.Get("login")
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	deletedUsersNum, err := h.Client.DeleteDocumentByLogin(ctx, "Main", "Users", login)
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	fmt.Fprintf(w, "Deleted %d users\n", deletedUsersNum)
@@ -123,16 +101,10 @@ func (h *Handlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // UserListHandler is handler for /userList method
 func (h *Handlers) UserListHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		errorMessage := "UserList request was performed not by GET method"
-		fmt.Fprintf(w, errorMessage)
-		panic(fmt.Sprintln(errorMessage))
-	}
-	
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	users, err := h.Client.GetAllDocuments(ctx, "Main", "Users")
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	
 	fmt.Fprintf(w, "User list:\n%s\n", users)
