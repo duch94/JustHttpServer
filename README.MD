@@ -16,4 +16,4 @@
 
 Пример запроса на удаление юзера по id:
 
-``` ```
+```curl -X DELETE localhost:80/deleteUser?login=vitya@email.com1```
