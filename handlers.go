@@ -48,6 +48,7 @@ func (h *Handlers) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := h.Client.SendDocument(ctx, "Main", "Users", newUser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusCreated) 
@@ -63,6 +64,7 @@ func (h *Handlers) ReadUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Client.GetDocumentByLogin(ctx, "Main", "Users", login)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprintf(w, "Read user: \n%s\n", user)
@@ -80,6 +82,7 @@ func (h *Handlers) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 												updatedKey, updatedValue)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprintf(w, "Updated %d user documents\n", updatedNumber)
@@ -94,6 +97,7 @@ func (h *Handlers) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	deletedUsersNum, err := h.Client.DeleteDocumentByLogin(ctx, "Main", "Users", login)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	fmt.Fprintf(w, "Deleted %d users\n", deletedUsersNum)
@@ -105,6 +109,7 @@ func (h *Handlers) UserListHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := h.Client.GetAllDocuments(ctx, "Main", "Users")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	
 	fmt.Fprintf(w, "User list:\n%s\n", users)
