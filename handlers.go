@@ -27,9 +27,19 @@ func NewHandlers(mongoHost string, mongoPort string) (*Handlers, error) {
 	return &h, nil
 }
 
-// RootHandler is used for authorization
-func (h *Handlers) RootHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := fmt.Fprintln(w, "This is simple http server")
+// LoginHandler is used for authorization
+func (h *Handlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+	someUser := make(map[string]interface{})
+	someUser["login"] = r.PostForm.Get("login")
+	someUser["password"] = r.PostForm.Get("password")
+
+	// проверить что логин существует и пароль подходит, если да - выдать куку
+
+	_, err = fmt.Fprintln(w, "This is simple http server")
 	if err != nil {
 		panic(err)
 	}

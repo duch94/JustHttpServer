@@ -20,7 +20,7 @@ func main() {
 
 	defer handlers.Client.Disconnect()
 
-	router.HandleFunc("/", handlers.RootHandler).Methods("GET")
+	router.HandleFunc("/login", handlers.LoginHandler).Methods("POST")
 	router.HandleFunc("/createUser", handlers.CreateUserHandler).Methods("POST")
 	router.HandleFunc("/readUser", handlers.ReadUserHandler).Methods("GET")
 	router.HandleFunc("/updateUser", handlers.UpdateUserHandler).Methods("PUT")
